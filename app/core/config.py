@@ -1,0 +1,25 @@
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+
+class Settings(BaseSettings):
+    # OpenAI
+    openai_api_key: str = ""
+
+    # Brave Search
+    brave_api_key: Optional[str] = None
+
+    # WordPress
+    wordpress_url: Optional[str] = None
+    wordpress_username: Optional[str] = None
+    wordpress_app_password: Optional[str] = None
+
+    # Auth
+    jwt_secret: str = "dev-secret-change-in-production"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 1440  # 24 hours
+
+    model_config = {"env_file": ".env"}
+
+
+settings = Settings()

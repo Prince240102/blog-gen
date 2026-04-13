@@ -1,0 +1,60 @@
+services:
+  blog-gen:
+    build: .
+    container_name: blog-gen-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  wordpress:
+    image: wordpress:latest
+    container_name: blog-gen-wp
+    ports:
+      - "8888:80"
+    environment:
+      WORDPRESS_DB_HOST: wp-db
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      wp-db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  wp-db:
+    image: mariadb:10.11
+    container_name: blog-gen-wp-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp
+      MYSQL_PASSWORD: wp_password
+    volumes:
+      - wp-db-data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  wp-db-data:
