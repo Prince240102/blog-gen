@@ -32,8 +32,8 @@ pytest
 | Service | URL | Container |
 |---------|-----|-----------|
 | BlogForge API | http://localhost:8000 | blog-gen-api |
-| WordPress | http://localhost:8888 | blog-gen-wp |
-| WP Admin | http://localhost:8888/wp-admin | — |
+| WordPress | http://localhost:18888 | blog-gen-wp |
+| WP Admin | http://localhost:18888/wp-admin | — |
 
 ## Required Env vars
 

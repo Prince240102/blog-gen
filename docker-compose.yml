@@ -3,7 +3,7 @@ services:
     build: .
     container_name: blog-gen-api
     ports:
-      - "8001:8000"
+      - "18001:8000"
     env_file:
       - .env
     volumes:
@@ -23,7 +23,7 @@ services:
     image: wordpress:latest
     container_name: blog-gen-wp
     ports:
-      - "8888:80"
+      - "18888:80"
     environment:
       WORDPRESS_DB_HOST: wp-db
       WORDPRESS_DB_USER: wp

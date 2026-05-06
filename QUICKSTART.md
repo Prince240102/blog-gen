@@ -5,7 +5,7 @@
 | Container | URL | Purpose |
 |-----------|-----|---------|
 | `blog-gen-api` | http://localhost:8000 | BlogForge app |
-| `blog-gen-wp` | http://localhost:8888 | WordPress (test target) |
+| `blog-gen-wp` | http://localhost:18888 | WordPress (test target) |
 | `blog-gen-wp-db` | — | MariaDB for WordPress |
 
 ## Credentials
@@ -82,8 +82,8 @@ Example payload sent to WordPress:
 | Purpose | URL |
 |---------|-----|
 | BlogForge App | http://localhost:8000 |
-| WordPress Admin | http://localhost:8888/wp-admin |
-| WordPress Home | http://localhost:8888 |
+| WordPress Admin | http://localhost:18888/wp-admin |
+| WordPress Home | http://localhost:18888 |
 
 ## Troubleshooting
 

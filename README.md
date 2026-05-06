@@ -15,8 +15,8 @@ docker compose up --build -d
 | Service | URL |
 |---|---|
 | BlogForge | http://localhost:8000 |
-| WordPress | http://localhost:8888 |
-| WP Admin | http://localhost:8888/wp-admin (admin / admin123) |
+| WordPress | http://localhost:18888 |
+| WP Admin | http://localhost:18888/wp-admin (admin / admin123) |
 
 ## How It Works
 

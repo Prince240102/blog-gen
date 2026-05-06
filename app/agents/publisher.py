@@ -113,9 +113,9 @@ def publish_node(state: dict) -> dict:
             data = resp.json()
             post_status = data.get("status", "draft")
             permalink = data.get("link", "")
-            permalink = re.sub(r"^http://wordpress(?::\d+)?", "http://localhost:8888", permalink)
+            permalink = re.sub(r"^http://wordpress(?::\d+)?", "http://localhost:18888", permalink)
             # For drafts, return admin edit URL instead of public permalink
-            edit_url = f"http://localhost:8888/wp-admin/post.php?post={data.get('id')}&action=edit"
+            edit_url = f"http://localhost:18888/wp-admin/post.php?post={data.get('id')}&action=edit"
             return {
                 **state,
                 "publish_success": True,

@@ -3,7 +3,7 @@
 set -e
 
 echo "⏳ Waiting for WordPress..."
-until curl -sf http://localhost:8888/ > /dev/null 2>&1; do sleep 2; done
+until curl -sf http://localhost:18888/ > /dev/null 2>&1; do sleep 2; done
 echo "✅ WordPress is up"
 
 # Install WP-CLI
@@ -17,7 +17,7 @@ mv wp-cli.phar /usr/local/bin/wp
 # Install WordPress if not already installed
 echo "🔧 Installing WordPress..."
 docker exec blog-gen-wp wp core install \
-  --url='http://localhost:8888' \
+  --url='http://localhost:18888' \
   --title='BlogForge Test' \
   --admin_user=admin \
   --admin_password=admin123 \
@@ -30,8 +30,8 @@ docker exec blog-gen-wp wp rewrite structure '/%postname%/' --allow-root 2>&1
 
 # Ensure both siteurl and home use the external URL (for proper login redirects)
 echo "🌐 Setting WordPress URLs..."
-docker exec blog-gen-wp wp option update siteurl 'http://localhost:8888' --allow-root 2>&1
-docker exec blog-gen-wp wp option update home 'http://localhost:8888' --allow-root 2>&1
+docker exec blog-gen-wp wp option update siteurl 'http://localhost:18888' --allow-root 2>&1
+docker exec blog-gen-wp wp option update home 'http://localhost:18888' --allow-root 2>&1
 
 # Enable application passwords via functions.php filter
 echo "🔑 Enabling application passwords..."
@@ -96,6 +96,6 @@ docker compose restart blog-gen 2>/dev/null || true
 
 echo ""
 echo "✅ Setup complete!"
-echo "   WordPress UI:  http://localhost:8888 (admin / admin123)"
-echo "   BlogForge:     http://localhost:8000"
+echo "   WordPress UI:  http://localhost:18888 (admin / admin123)"
+echo "   BlogForge:     http://localhost:18001"
 echo ""
