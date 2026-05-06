@@ -12,6 +12,9 @@ class Settings(BaseSettings):
 
     # WordPress
     wordpress_url: Optional[str] = None
+    # Public URL used for permalinks/admin links returned to the browser.
+    # Example: http://10.0.0.193:18888
+    wordpress_public_url: Optional[str] = None
     wordpress_username: Optional[str] = None
     wordpress_app_password: Optional[str] = None
 
