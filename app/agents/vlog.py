@@ -13,6 +13,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 
 from app.services.llm import llm
+from app.services.progress import get_progress
 
 
 # ---------------------------------------------------------------------------
@@ -22,7 +23,9 @@ from app.services.llm import llm
 def convert_node(state: dict) -> dict:
     blog_content = state.get("blog_content", "")
     duration = state.get("duration_minutes", 10)
-    target_words = duration * 150  # ~150 spoken words per minute
+    target_words = duration * 150
+
+    get_progress().emit(f"Creating {duration}-min video script…")
 
     system = (
         "You are a professional video scriptwriter. Convert blog content into "
@@ -41,8 +44,19 @@ def convert_node(state: dict) -> dict:
         "Convert this into a vlog video script."
     )
 
-    resp = llm.invoke([SystemMessage(content=system), HumanMessage(content=human)])
-    script = resp.content
+    chunks: list[str] = []
+    emitted = 0
+    for chunk in llm.stream([SystemMessage(content=system), HumanMessage(content=human)]):
+        text = getattr(chunk, "content", "") or ""
+        if not text:
+            continue
+        chunks.append(text)
+        emitted += len(text)
+        if emitted >= 240:
+            snippet = "".join(chunks)
+            get_progress().emit(snippet[-140:].replace("\n", " ").strip())
+            emitted = 0
+    script = "".join(chunks)
 
     timestamps = _parse_timestamps(script)
     notes = _parse_narrator_notes(script)

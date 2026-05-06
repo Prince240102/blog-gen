@@ -2,8 +2,9 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential curl \
+RUN apt-get update -o Acquire::Retries=3 \
+    && apt-get install -y --no-install-recommends \
+       build-essential curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

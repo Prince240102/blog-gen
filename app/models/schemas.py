@@ -54,8 +54,11 @@ class ChatResponse(BaseModel):
 class SessionResponse(BaseModel):
     session_id: str
     user_id: str
-    messages: list[dict] = []
+    messages: list[dict] = Field(default_factory=list)
     created_at: Optional[str] = None
+    has_draft: bool = False
+    is_published: bool = False
+    permalink: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------

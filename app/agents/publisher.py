@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import base64
 import re
-from typing import Optional
 
 import httpx
 from langgraph.graph import END, StateGraph
@@ -38,14 +37,7 @@ def _markdown_to_html(markdown: str) -> str:
     return html
 
 
-def _strip_markdown_headings(markdown: str) -> str:
-    """Remove #, ##, ### from markdown while preserving structure."""
-    lines = []
-    for line in markdown.split("\n"):
-        stripped = line.lstrip("#").strip()
-        if stripped:
-            lines.append(stripped)
-    return "\n".join(lines)
+
 
 
 # ---------------------------------------------------------------------------
@@ -64,6 +56,7 @@ def publish_node(state: dict) -> dict:
     author = state.get("author", 1)
     featured_media = state.get("featured_media")
     acf = state.get("acf")
+    meta = state.get("meta")
 
     base_url = settings.wordpress_url
     username = settings.wordpress_username
@@ -106,6 +99,8 @@ def publish_node(state: dict) -> dict:
         payload["featured_media"] = featured_media
     if acf:
         payload["acf"] = acf
+    if meta:
+        payload["meta"] = meta
 
     try:
         with httpx.Client(timeout=30.0, follow_redirects=True) as client:
@@ -174,6 +169,7 @@ def run_publisher(
     slug: str | None = None,
     featured_media: int | None = None,
     acf: dict | None = None,
+    meta: dict | None = None,
 ) -> dict:
     result = publish_graph.invoke(
         {
@@ -187,6 +183,7 @@ def run_publisher(
             "slug": slug,
             "featured_media": featured_media,
             "acf": acf,
+            "meta": meta,
             "publish_success": False,
             "publish_error": "",
         }

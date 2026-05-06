@@ -3,9 +3,11 @@ services:
     build: .
     container_name: blog-gen-api
     ports:
-      - "8000:8000"
+      - "8001:8000"
     env_file:
       - .env
+    volumes:
+      - blogforge-data:/app/data
     depends_on:
       wordpress:
         condition: service_healthy
@@ -58,3 +60,4 @@ services:
 
 volumes:
   wp-db-data:
+  blogforge-data:

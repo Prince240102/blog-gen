@@ -6,8 +6,9 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = ""
 
-    # Brave Search
+    # Search APIs
     brave_api_key: Optional[str] = None
+    serper_api_key: Optional[str] = None
 
     # WordPress
     wordpress_url: Optional[str] = None

@@ -12,6 +12,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 
 from app.services.llm import llm
+from app.services.progress import get_progress
 
 
 # ---------------------------------------------------------------------------
@@ -26,6 +27,8 @@ def generate_node(state: dict) -> dict:
     style = state.get("style", "informative")
     word_count = state.get("word_count", 1500)
 
+    get_progress().emit(f"Writing blog post ({word_count} words)…")
+
     kw_str = ", ".join(keywords) if keywords else "general"
 
     system = (
@@ -38,7 +41,7 @@ def generate_node(state: dict) -> dict:
         f"- Aim for approximately {word_count} words\n"
         "- End with a clear call-to-action\n"
         "- Use bullet points or numbered lists where appropriate\n"
-        "- Write in an {style} tone"
+        f"- Write in an {style} tone"
     )
 
     human = (
@@ -48,8 +51,20 @@ def generate_node(state: dict) -> dict:
         "Write the full blog post now."
     )
 
-    resp = llm.invoke([SystemMessage(content=system), HumanMessage(content=human)])
-    content = resp.content
+    # Stream draft text into step_progress so the UI shows motion.
+    chunks: list[str] = []
+    emitted = 0
+    for chunk in llm.stream([SystemMessage(content=system), HumanMessage(content=human)]):
+        text = getattr(chunk, "content", "") or ""
+        if not text:
+            continue
+        chunks.append(text)
+        emitted += len(text)
+        if emitted >= 240:
+            snippet = "".join(chunks)
+            get_progress().emit(snippet[-140:].replace("\n", " ").strip())
+            emitted = 0
+    content = "".join(chunks)
 
     # Extract title from first H1 or first non-empty line
     title = _extract_title(content)

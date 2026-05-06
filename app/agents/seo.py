@@ -12,12 +12,12 @@ Optimizes content for search engine ranking by making actual improvements:
 from __future__ import annotations
 
 import re
-from typing import Optional
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 
 from app.services.llm import llm, llm_fast
+from app.services.progress import get_progress
 
 
 # ---------------------------------------------------------------------------
@@ -35,6 +35,8 @@ def extract_keywords_node(state: dict) -> dict:
     """Ask the LLM to extract/expand keywords from the research brief."""
     research = state.get("research", "")
     topic = state.get("topic", "")
+
+    get_progress().emit("Extracting keywords…")
 
     system = (
         "You are an SEO expert. Extract the best target keywords for a blog post."
@@ -66,6 +68,8 @@ def optimize_node(state: dict) -> dict:
     content = state.get("content", state.get("research", ""))
     keywords = state.get("keywords", [])
     kw_str = ", ".join(keywords) if keywords else "general"
+
+    get_progress().emit("Optimizing for SEO…")
 
     system = (
         "You are an elite SEO consultant. You MUST actually improve the content "
@@ -123,11 +127,6 @@ def _section(text: str, header: str) -> str:
     pattern = rf"{header}:\s*\n(.*?)(?=\n[A-Z_]+:|\Z)"
     m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
     return m.group(1).strip() if m else ""
-
-
-def _parse_int(text: str, default: int = 0) -> int:
-    m = re.search(r"\d+", text)
-    return int(m.group()) if m else default
 
 
 # ---------------------------------------------------------------------------

@@ -11,18 +11,19 @@ Removes AI-generated patterns ("slop") from blog content:
 
 from __future__ import annotations
 
-import re
-
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 
 from app.services.llm import llm
+from app.services.progress import get_progress
 
 
 def humanize_node(state: dict) -> dict:
     """Transform AI-generated content to sound human-written."""
     content = state.get("content", "")
     title = state.get("title", "")
+
+    get_progress().emit("Removing AI patterns…")
 
     system = (
         "You are an expert editor. Transform AI-generated blog content to sound "
@@ -44,8 +45,20 @@ def humanize_node(state: dict) -> dict:
 
     human = f"Title: {title}\n\nContent:\n{content}"
 
-    resp = llm.invoke([SystemMessage(content=system), HumanMessage(content=human)])
-    humanized = resp.content.strip()
+    # Stream edits into step_progress so the UI shows motion.
+    chunks: list[str] = []
+    emitted = 0
+    for chunk in llm.stream([SystemMessage(content=system), HumanMessage(content=human)]):
+        text = getattr(chunk, "content", "") or ""
+        if not text:
+            continue
+        chunks.append(text)
+        emitted += len(text)
+        if emitted >= 240:
+            snippet = "".join(chunks)
+            get_progress().emit(snippet[-140:].replace("\n", " ").strip())
+            emitted = 0
+    humanized = "".join(chunks).strip()
 
     return {
         **state,
